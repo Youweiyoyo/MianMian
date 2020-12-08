@@ -58,9 +58,9 @@
             <el-select v-model="formList.tages" placeholder="请选择">
               <el-option
                 v-for="item in tageList"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                :key="item.id"
+                :label="item.tagName"
+                :value="item.id"
               >
               </el-option>
             </el-select>
@@ -144,17 +144,28 @@
               placeholder="请选择"
               class="select"
               v-model="formList.city"
+              @change="cityChange"
             >
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+              <el-option
+                v-for="(item, index) in citydata"
+                :key="index"
+                :label="item"
+                :value="index"
+              >
+              </el-option>
             </el-select>
             <el-select
               placeholder="请选择"
               class="select list"
               v-model="formList.cityTwo"
             >
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+              <el-option
+                v-for="(item, index) in citydataTwo"
+                :key="index"
+                :label="item"
+                :value="index"
+              >
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -176,7 +187,9 @@
         <el-table-column prop="catalog" label="目录"> </el-table-column>
         <el-table-column label="题型">
           <template slot-scope="scope">
-            {{ scope.row.questionType === "1" ? "单选" : "多选" }}
+            <div v-if="scope.row.questionType === '1'">单选</div>
+            <div v-else-if="scope.row.questionType === '2'">多选</div>
+            <div v-else>简单</div>
           </template>
         </el-table-column>
         <el-table-column label="题干">
@@ -198,6 +211,7 @@
         <el-table-column label="操作">
           <template slot-scope="scope">
             <el-button
+              @click="preview(scope.row.id)"
               title="预览"
               type="primary"
               icon="el-icon-view"
@@ -248,18 +262,29 @@
       >
       </el-pagination>
     </el-card>
+    <!-- 对话框 -->
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+      <questions-preview
+        v-if="dialogVisible"
+        @questionsClose="dialogVisible = false"
+        :dataId="this.dataId"
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { provinces, citys } from "@/api/hmmm/citys"; // 一级城市
 import { list } from "@/api/hmmm/questions";
 import { parseTime } from "@/filters/index"; // 导入时间过滤器
 import { simple } from "@/api/hmmm/subjects"; // 学科输入框
 import { list as directList } from "@/api/hmmm/directorys"; // 二级目录输入框
-import { simple as dierctsimple } from "@/api/hmmm/tags"; // 获取标签列表
+import { list as dierctsimple } from "@/api/hmmm/tags"; // 获取标签列表
 import { difficulty, questionType, direction } from "@/api/hmmm/constants"; // 方向，题型，难度
 import { remove } from "@/api/hmmm/questions";
+import QuestionsPreview from "../../module-hmmm/components/questions-preview";
 export default {
+  components: { QuestionsPreview }, // 注册组件
   data() {
     return {
       questionType: questionType, // 题型
@@ -291,14 +316,19 @@ export default {
       total: 0, // 共有多少条数据
       List: [], // 获取所有学科数据
       catalogue: [], // 二级目录所有数据
-      tageList: [] // 获取所有的标签数据
+      tageList: [], // 获取所有的标签数据
+      citydata: [], // 省份
+      options: [], // 录入人等----
+      citydataTwo: [], // 城市
+      dialogVisible: false, // 控制弹出框弹出
+      dataId: "" // 定义题目id
     };
   },
   created() {
     // 发起Ajax请求
     this.getTableList(); // 获取表格数据
     this.getSubject(); // 获取学科简单列表
-    this.getGtages(); // 获取标签列表
+    this.citydata = provinces(); // 省份
   },
   computed: {},
   methods: {
@@ -329,19 +359,12 @@ export default {
     async alterchange(id) {
       console.log(id);
       try {
-        const { data } = await directList({ id: id });
+        const { data } = await directList({ subjectID: id });
         console.log(data);
         this.catalogue = data.items;
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    // 获取标签列表
-    async getGtages() {
-      try {
-        const { data } = await dierctsimple();
-        console.log(data);
-        this.tageList = data;
+        const { data: res } = await dierctsimple();
+        console.log(res);
+        this.tageList = res.items;
       } catch (err) {
         console.log(err);
       }
@@ -397,6 +420,16 @@ export default {
     handleCurrentChange(newPage) {
       this.counts.page = newPage;
       this.getTableList();
+    },
+    // 渲染城市二级目录事件
+    cityChange(value) {
+      this.citydataTwo = citys(this.citydata[value]);
+    },
+    // 预览
+    preview(id) {
+      console.log(id);
+      this.dialogVisible = true;
+      this.dataId = id;
     }
   }
 };
