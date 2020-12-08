@@ -117,13 +117,13 @@
         <el-col :span="6">
           <el-form-item label="录入人" size="small" prop="dataentryclerk">
             <el-select v-model="formList.dataentryclerk" placeholder="请选择">
-              <el-option
+              <!-- <el-option
                 v-for="item in options"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
               >
-              </el-option>
+              </el-option> -->
             </el-select>
           </el-form-item>
         </el-col>
@@ -176,7 +176,7 @@
         <el-table-column prop="catalog" label="目录"> </el-table-column>
         <el-table-column label="题型">
           <template slot-scope="scope">
-            {{ scope.row.questionType === "1" ? "单选" : "多选" }}
+            {{ scope.row.questionType === '1' ? '单选' : '多选' }}
           </template>
         </el-table-column>
         <el-table-column label="题干">
@@ -191,7 +191,7 @@
         </el-table-column>
         <el-table-column label="难度">
           <template slot-scope="scope">
-            {{ scope.row.difficulty === "1" ? "简单" : "一般" }}
+            {{ scope.row.difficulty === '1' ? '简单' : '一般' }}
           </template>
         </el-table-column>
         <el-table-column prop="creator" label="录入人"> </el-table-column>
@@ -252,13 +252,13 @@
 </template>
 
 <script>
-import { list } from "@/api/hmmm/questions";
-import { parseTime } from "@/filters/index"; // 导入时间过滤器
-import { simple } from "@/api/hmmm/subjects"; // 学科输入框
-import { list as directList } from "@/api/hmmm/directorys"; // 二级目录输入框
-import { simple as dierctsimple } from "@/api/hmmm/tags"; // 获取标签列表
-import { difficulty, questionType, direction } from "@/api/hmmm/constants"; // 方向，题型，难度
-import { remove } from "@/api/hmmm/questions";
+import { list } from '@/api/hmmm/questions'
+import { parseTime } from '@/filters/index' // 导入时间过滤器
+import { simple } from '@/api/hmmm/subjects' // 学科输入框
+import { list as directList } from '@/api/hmmm/directorys' // 二级目录输入框
+import { simple as dierctsimple } from '@/api/hmmm/tags' // 获取标签列表
+import { difficulty, questionType, direction } from '@/api/hmmm/constants' // 方向，题型，难度
+import { remove } from '@/api/hmmm/questions'
 export default {
   data() {
     return {
@@ -275,131 +275,131 @@ export default {
       rules: {},
       // 表单数据
       formList: {
-        tages: "", // 标签
-        Subject: "", // 学科表单
-        directory: "", // 二级目录
-        questionTypes: "", // 题型
-        difficultyTypes: "", // 难度
-        directionTypes: "", // 方向
-        dataentryclerk: "", // 录入人
-        Titlenotes: "", // 题目备注
-        shortened: "", // 企业简称
-        city: "", // 城市
-        cityTwo: "", // 城市二
-        keyword: "" // 关键字
+        tages: '', // 标签
+        Subject: '', // 学科表单
+        directory: '', // 二级目录
+        questionTypes: '', // 题型
+        difficultyTypes: '', // 难度
+        directionTypes: '', // 方向
+        dataentryclerk: '', // 录入人
+        Titlenotes: '', // 题目备注
+        shortened: '', // 企业简称
+        city: '', // 城市
+        cityTwo: '', // 城市二
+        keyword: '' // 关键字
       },
       total: 0, // 共有多少条数据
       List: [], // 获取所有学科数据
       catalogue: [], // 二级目录所有数据
       tageList: [] // 获取所有的标签数据
-    };
+    }
   },
   created() {
     // 发起Ajax请求
-    this.getTableList(); // 获取表格数据
-    this.getSubject(); // 获取学科简单列表
-    this.getGtages(); // 获取标签列表
+    this.getTableList() // 获取表格数据
+    this.getSubject() // 获取学科简单列表
+    this.getGtages() // 获取标签列表
   },
   computed: {},
   methods: {
     // 发起渲染表格的请求
     async getTableList() {
       try {
-        const { data } = await list(this.counts);
-        this.tableData = data.items; // 表格数据
-        this.counts.page = parseInt(data.page); //  当前页数
-        this.counts.pagesize = parseInt(data.pagesize); // 当前每页显示多少条数据
-        this.total = data.counts; // 共多少条数据
-        console.log(data);
+        const { data } = await list(this.counts)
+        this.tableData = data.items // 表格数据
+        this.counts.page = parseInt(data.page) //  当前页数
+        this.counts.pagesize = parseInt(data.pagesize) // 当前每页显示多少条数据
+        this.total = data.counts // 共多少条数据
+        console.log(data)
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     },
     //  获取学科简单列表
     async getSubject() {
       try {
-        const { data } = await simple();
+        const { data } = await simple()
         // console.log(data);
-        this.List = data;
+        this.List = data
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     },
     // 学科的change事件
     async alterchange(id) {
-      console.log(id);
+      console.log(id)
       try {
-        const { data } = await directList({ id: id });
-        console.log(data);
-        this.catalogue = data.items;
+        const { data } = await directList({ id: id })
+        console.log(data)
+        this.catalogue = data.items
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     },
     // 获取标签列表
     async getGtages() {
       try {
-        const { data } = await dierctsimple();
-        console.log(data);
-        this.tageList = data;
+        const { data } = await dierctsimple()
+        console.log(data)
+        this.tageList = data
       } catch (err) {
-        console.log(err);
+        console.log(err)
       }
     },
     // 删除数据
     async deleteData(id) {
       // 先弹框询问
       const configDel = await this.$confirm(
-        "此操作将永久删除该题目, 是否继续?",
-        "提示",
+        '此操作将永久删除该题目, 是否继续?',
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
-      ).catch(err => err);
-      if (configDel !== "confirm") {
-        return this.$message("取消了本次删除操作");
+      ).catch(err => err)
+      if (configDel !== 'confirm') {
+        return this.$message('取消了本次删除操作')
       }
-      await remove({ id: id }); // 调接口删除
-      return this.$message.success("删除成功");
-      this.getTableList(); // 刷新列表
+      await remove({ id: id }) // 调接口删除
+      return this.$message.success('删除成功')
+      this.getTableList() // 刷新列表
     },
     // 添加精选
     async Addtheselected(value) {
       // 先弹框询问
       const configDel = await this.$confirm(
-        "是否将题目添加到精选题库, 是否继续?",
-        "提示",
+        '是否将题目添加到精选题库, 是否继续?',
+        '提示',
         {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
         }
-      ).catch(err => err);
-      if (configDel !== "confirm") {
-        return this.$message("取消了本次操作");
+      ).catch(err => err)
+      if (configDel !== 'confirm') {
+        return this.$message('取消了本次操作')
       }
-      this.$router.push("/questions/choice");
+      this.$router.push('/questions/choice')
     },
     // 清空表单数据
     RefstForm() {
-      console.log(this);
-      this.$refs.formRef.resetFields();
+      console.log(this)
+      this.$refs.formRef.resetFields()
     },
     // 监听pageSize事件
     handleSizeChange(newSize) {
       // console.log(newSize);
-      this.counts.pagesize = newSize;
-      this.getTableList();
+      this.counts.pagesize = newSize
+      this.getTableList()
     },
     // 监听页码值改变的事件
     handleCurrentChange(newPage) {
-      this.counts.page = newPage;
-      this.getTableList();
+      this.counts.page = newPage
+      this.getTableList()
     }
   }
-};
+}
 </script>
 
 <style scoped lang="less">
