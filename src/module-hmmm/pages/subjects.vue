@@ -345,7 +345,7 @@ export default {
             this.getSubjectsList();
             // 还要清空表单数据
             // 提示信息
-            this.$message.success("修改学科信息成功！");
+            // .this.$message.success("修改学科信息成功！");
           } catch (err) {
             this.editSubjectsDialogVisible = false;
 
