@@ -26,7 +26,7 @@
         <el-col :span="6">
           <el-form-item label="学科" size="small" prop="Subject">
             <el-select
-              v-model="formList.Subject"
+              v-model="formList.subjectID"
               placeholder="请选择"
               @change="alterchange"
             >
@@ -47,7 +47,7 @@
                 v-for="item in catalogue"
                 :key="item.id"
                 :label="item.directoryName"
-                :value="item.id"
+                :value="item.directoryName"
               >
               </el-option>
             </el-select>
@@ -70,14 +70,14 @@
           <el-form-item label="关键字" size="small" prop="keyword">
             <el-input
               placeholder="根据题干搜索"
-              v-model="formList.keyword"
+              v-model="counts.keyword"
             ></el-input>
           </el-form-item>
         </el-col>
         <!-- 第二行 -->
         <el-col :span="6">
-          <el-form-item label="试题类型" size="small" prop="questionTypes">
-            <el-select v-model="formList.questionTypes" placeholder="请选择">
+          <el-form-item label="试题类型" size="small" prop="questionType">
+            <el-select v-model="formList.questionType" placeholder="请选择">
               <el-option
                 v-for="item in questionType"
                 :key="item.value"
@@ -118,7 +118,7 @@
           <el-form-item label="录入人" size="small" prop="dataentryclerk">
             <el-select v-model="formList.dataentryclerk" placeholder="请选择">
               <el-option
-                v-for="item in formList.addUserList"
+                v-for="item in addUserList"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
@@ -139,7 +139,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="城市" size="small" prop="city,cityTwo">
+          <el-form-item label="城市" size="small" prop="city">
             <el-select
               placeholder="请选择"
               class="select"
@@ -208,7 +208,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="creator" label="录入人"> </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" width="200">
           <template slot-scope="scope">
             <el-button
               @click="preview(scope.row.id)"
@@ -226,7 +226,7 @@
               circle
               plain
               size="small"
-              @click="$router.push('/questions/new')"
+              @click="toEdit(scope.row)"
             ></el-button>
             <el-button
               title="删除"
@@ -244,7 +244,7 @@
               circle
               plain
               size="small"
-              @click="Addtheselected(scope.row.id)"
+              @click="Addtheselected(scope.row)"
             ></el-button>
           </template>
         </el-table-column>
@@ -281,7 +281,7 @@ import { simple } from '@/api/hmmm/subjects' // 学科输入框
 import { list as directList } from '@/api/hmmm/directorys' // 二级目录输入框
 import { list as dierctsimple } from '@/api/hmmm/tags' // 获取标签列表
 import { difficulty, questionType, direction } from '@/api/hmmm/constants' // 方向，题型，难度
-import { remove } from '@/api/hmmm/questions'
+import { remove, choiceAdd } from '@/api/hmmm/questions'
 import QuestionsPreview from '../../module-hmmm/components/questions-preview'
 export default {
   components: { QuestionsPreview }, // 注册组件
@@ -293,36 +293,37 @@ export default {
       tableData: [], // 表格数据
       // 获取用户列表的参数对象
       counts: {
+        keyword: '',
         page: 1, // 当前的页数
         pagesize: 2 // 当前每页显示多少条数据
       },
       // 校验规则
       rules: {},
+      // 录入人
+      addUserList: [
+        {
+          value: '0',
+          label: '超级管理员'
+        },
+        {
+          value: '1',
+          label: '录入管理员'
+        }
+      ],
       // 表单数据
       formList: {
-        // 录入人
-        addUserList: [
-          {
-            value: '0',
-            label: '超级管理员'
-          },
-          {
-            value: '1',
-            label: '录入管理员'
-          }
-        ],
         tages: '', // 标签
-        Subject: '', // 学科表单
+        subjectID: '', // 学科表单
         directory: '', // 二级目录
-        questionTypes: '', // 题型
+        questionType: '', // 题型
         difficultyTypes: '', // 难度
         directionTypes: '', // 方向
         dataentryclerk: '', // 录入人
         Titlenotes: '', // 题目备注
         shortened: '', // 企业简称
         city: '', // 城市
-        cityTwo: '', // 城市二
-        keyword: '' // 关键字
+        cityTwo: '' // 城市二
+        // keyword: '' // 关键字
       },
       total: 0, // 共有多少条数据
       List: [], // 获取所有学科数据
@@ -346,7 +347,8 @@ export default {
     // 发起渲染表格的请求
     async getTableList() {
       try {
-        const { data } = await list(this.counts)
+        // const { data } = await list({ ...this.counts, ...this.formList })
+        const { data } = await list({ ...this.counts })
         this.tableData = data.items // 表格数据
         this.counts.page = parseInt(data.page) //  当前页数
         this.counts.pagesize = parseInt(data.pagesize) // 当前每页显示多少条数据
@@ -401,25 +403,31 @@ export default {
     },
     // 添加精选
     async Addtheselected(value) {
+      console.log(value)
       // 先弹框询问
-      const configDel = await this.$confirm(
-        '是否将题目添加到精选题库, 是否继续?',
-        '提示',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }
-      ).catch(err => err)
-      if (configDel !== 'confirm') {
-        return this.$message('取消了本次操作')
-      }
+      this.$confirm('此操作将题目添加到精选题库, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          await choiceAdd({ id: value.id, choiceState: 1 })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
       this.$router.push('/questions/choice')
     },
     // 清空表单数据
     RefstForm() {
       console.log(this)
       this.$refs.formRef.resetFields()
+      this.counts.keyword = ''
+      this.formList.cityTwo = ''
+      this.citydataTwo = []
     },
     // 监听pageSize事件
     handleSizeChange(newSize) {
@@ -441,6 +449,13 @@ export default {
       console.log(id)
       this.dialogVisible = true
       this.dataId = id
+    },
+    toEdit(item) {
+      console.log(item)
+      this.$router.push({
+        path: 'new',
+        query: { id: item.id }
+      })
     }
   }
 }

@@ -278,20 +278,19 @@
                           disabled
                           type="text"
                           size="small"
-                          @click="auditData(scope.row.id)"
                           >审核</el-button
                         >
                         <el-button
                           v-else
                           type="text"
                           size="small"
-                          @click="auditData(scope.row.id)"
+                          @click="auditData(scope.row)"
                           >审核</el-button
                         >
                         <el-button
                           type="text"
                           size="small"
-                          @click="modification"
+                          @click="modification(scope.row)"
                           >修改</el-button
                         >
                         <!-- 上下架按钮 -->
@@ -406,7 +405,7 @@
                         <el-button
                           type="text"
                           size="small"
-                          @click="modification"
+                          @click="modification(scope.row)"
                           >修改</el-button
                         >
                         <el-button type="text" size="small">下架</el-button>
@@ -502,7 +501,7 @@
                         <el-button
                           type="text"
                           size="small"
-                          @click="modification"
+                          @click="modification(scope.row)"
                           >修改</el-button
                         >
                         <el-button type="text" size="small">下架</el-button>
@@ -598,7 +597,7 @@
                         <el-button
                           type="text"
                           size="small"
-                          @click="modification"
+                          @click="modification(scope.row)"
                           >修改</el-button
                         >
                         <el-button type="text" size="small">下架</el-button>
@@ -633,24 +632,22 @@
     </el-dialog>
     <!-- 审核弹出框 -->
     <el-dialog title="提示" :visible.sync="auditDialogVisible" width="20%">
-      <el-form>
-        <el-radio-group v-model="radio">
-          <el-radio :label="3">通过</el-radio>
-          <el-radio :label="6">拒绝</el-radio>
+      <el-form :model="checkForm">
+        <el-radio-group v-model="checkForm.chkState">
+          <el-radio :label="1">通过</el-radio>
+          <el-radio :label="2">拒绝</el-radio>
         </el-radio-group>
         <el-input
           class="textarea"
           type="textarea"
           :rows="2"
           placeholder="请输入内容"
-          v-model="textarea"
+          v-model="checkForm.chkRemarks"
         >
         </el-input>
         <div class="flexRight">
           <el-button @click="auditDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="auditDialogVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="checkBox">确 定</el-button>
         </div>
       </el-form>
     </el-dialog>
@@ -662,12 +659,13 @@ import { simple, detail } from '@/api/hmmm/subjects'
 import { list as tagList } from '@/api/hmmm/tags'
 import { list as catalogueList } from '@/api/hmmm/directorys'
 import { list as companyList } from '@/api/hmmm/companys'
-import { choice as questChoice } from '@/api/hmmm/questions'
+import { choice as questChoice, choiceCheck } from '@/api/hmmm/questions'
 import { provinces, citys } from '@/api/hmmm/citys'
 import { parseTime } from '@/filters/index'
 import { choicePublish, remove } from '@/api/hmmm/questions' // 上下架题库接口
 // 引入预览组件
 import QuestionsPreview from '../../module-hmmm/components/questions-preview'
+
 export default {
   name: 'QuestionsChoice',
   components: {
@@ -732,7 +730,13 @@ export default {
       },
       total: 0,
       // 校验规则
-      rules: {}
+      rules: {},
+      // 审核题目
+      checkForm: {
+        id: '',
+        chkState: 1,
+        chkRemarks: ''
+      }
     }
   },
   computed: {},
@@ -822,12 +826,18 @@ export default {
     },
     // 清除表单事件
     clearForm() {
-      this.formList.cityValue == ''
       this.$refs.ResForm.resetFields()
+      this.citiesList = []
+      this.formList.cityValue = ''
     },
     // 修改按钮
-    modification() {
-      this.$router.push('/questions/new')
+    modification(item) {
+      console.log(item)
+      this.$router.push({
+        path: 'new',
+        query: { id: item.id }
+      })
+      // this.$router.push('/questions/new')
     },
     // 题目下架
     async soldOut(item) {
@@ -850,8 +860,14 @@ export default {
       if (configDel !== 'confirm') {
         return this.$message('取消了本次操作')
       }
+      if (this.allTableData.publishState == 0) {
+        this.allTableData.publishState = 1
+      } else {
+        this.allTableData.publishState = 0
+      }
       await choicePublish({ id: item.id, publishState: publishState })
       this.$message.success('操作成功')
+      this.getQuestionList()
     },
     // 题目删除
     async deleteData(id) {
@@ -868,8 +884,22 @@ export default {
       this.$message.success('删除成功')
     },
     // 题目审核
-    auditData(id) {
+    auditData(item) {
+      // choiceCheck
+      // auditDialogVisible = false
+      this.checkForm.id = item.id
+      console.log(item)
       this.auditDialogVisible = true
+    },
+    async checkBox() {
+      try {
+        const { data } = await choiceCheck(this.checkForm)
+        this.getQuestionList()
+        console.log(data)
+      } catch (err) {
+        console.log(err)
+      }
+      this.auditDialogVisible = false
     }
   }
 }
