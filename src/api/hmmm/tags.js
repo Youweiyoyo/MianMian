@@ -28,4 +28,5 @@ export const update = data => createAPI(`/tags/${data.id}`, 'put', data)
 export const remove = data => createAPI(`/tags/${data.id}`, 'delete', data)
 
 // 标签状态
-export const changeState = data => createAPI(`/tags/${data.id}/${data.state}`, 'post', data)
+export const changeState = data =>
+  createAPI(`/tags/${data.id}/${data.state}`, 'post', data)
