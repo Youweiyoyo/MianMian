@@ -25,15 +25,26 @@
           </el-col>
           <el-col :span="6">
             <el-button @click="deleteList">清除</el-button>
-            <el-button type="primary" @click="getList">搜索</el-button>
+            <el-button type="primary" @click="getTagList">搜索</el-button>
           </el-col>
-          <el-button
-            style="float:right"
-            type="success"
-            icon="el-icon-edit"
-            @click="dialogVisible = true"
-            >新增标签</el-button
-          >
+          <div class="btn">
+            <el-button
+              style="float:right"
+              type="success"
+              icon="el-icon-edit"
+              @click="dialogVisible = true"
+              >新增标签</el-button
+            >
+            <el-button
+            class="btnback"
+              v-show="queryInfo.subjectID"
+              type="text"
+              icon="el-icon-back"
+              size="small"
+              @click="$router.back()"
+              >返回学科</el-button
+            >
+          </div>
         </el-form>
         <el-alert :closable="false" title="数据一共12条" type="info" show-icon>
         </el-alert>
@@ -52,13 +63,13 @@
             </el-table-column>
             <el-table-column label="状态">
               <template slot-scope="scope">
-                {{ scope.row.state === 0 ? "已启用" : "已禁用" }}
+                {{ scope.row.state === 0 ? '已启用' : '已禁用' }}
               </template>
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="text" @click="handle(scope.row)">
-                  {{ scope.row.state === 1 ? "启动" : "禁用" }}
+                  {{ scope.row.state === 1 ? '启动' : '禁用' }}
                 </el-button>
                 <el-button
                   type="text"
@@ -89,11 +100,12 @@
           </el-pagination>
         </template>
       </el-card>
+      <!-- 新增弹出层 -->
       <el-dialog
         height="80%"
         title="新增标签"
         :visible.sync="dialogVisible"
-        width="50%"
+        width="30%"
       >
         <el-form
           :model="addForm"
@@ -104,7 +116,7 @@
         >
           <el-form-item label="所属学科">
             <el-form-item>
-              <el-select v-model="addForm.subjectID" placeholder="请选择">
+              <el-select v-model="addForm.subjectID" placeholder="请选择" style="width: 100%">
                 <el-option
                   v-for="item in subjectLists"
                   :key="item.value"
@@ -116,18 +128,21 @@
             </el-form-item>
           </el-form-item>
           <el-form-item class="heihei" label="目录名称" prop="tagName">
-            <el-input class="el-input" v-model="addForm.tagName"></el-input>
+            <el-input class="el-input" v-model="addForm.tagName" style="width:100%"></el-input>
           </el-form-item>
         </el-form>
-        <span slot="footer" class="dialog-footer">
+        <div class="btnbtn">
+          <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="addTage">确 定</el-button>
         </span>
+        </div>
       </el-dialog>
-      <el-dialog title="提示" :visible.sync="editdialogVisible" width="50%">
+      <!-- 修改弹出层 -->
+      <el-dialog title="提示" :visible.sync="editdialogVisible" width="30%">
         <el-form ref="form" label-width="80px">
           <el-form-item label="所属学科">
-            <el-select v-model="addForm.subjectID" placeholder="请选择">
+            <el-select v-model="addForm.subjectID" placeholder="请选择" style="width: 100%">
               <el-option
                 v-for="item in subjectLists"
                 :key="item.value"
@@ -144,162 +159,172 @@
               { type: 'number', message: '年龄必须为数字值' }
             ]"
           >
-            <el-input v-model="addForm.tagName"></el-input>
+            <el-input v-model="addForm.tagName" style="width:100%"></el-input>
           </el-form-item>
         </el-form>
-        <span slot="footer" class="dialog-footer">
+        <div class="btnbtn">
+          <span slot="footer" class="dialog-footer">
           <el-button @click="dialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="editValue">确 定</el-button>
         </span>
+        </div>
       </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-import {list as  tagList, remove, add, update } from "@/api/hmmm/tags";
-import { parseTime } from "@/filters/index";
-import { simple } from "@/api/hmmm/subjects";
+import { list as tagList, remove, add, update } from '@/api/hmmm/tags'
+import { parseTime } from '@/filters/index'
+import { simple } from '@/api/hmmm/subjects'
 export default {
   data() {
     return {
       //这个是点击修改确定后的id
       id: 0,
       subjectID: 0,
-      msg: "aaa",
+      msg: 'aaa',
       yang: false,
-      value: "",
+      value: '',
       dialogVisible: false,
       rulesForm: {
-        name: "",
-        status: ""
+        name: '',
+        status: ''
       },
       rulesd: {
         name: [],
         status: []
       },
       queryInfo: {
-        tagName: "",
+        tagName: '',
         state: null,
         //   当前的页数
         page: 1,
         // 当前每页显示多少条数据
-        pagesize: 2
+        pagesize: 2,
+        subjectID: parseInt(this.$route.query.id)
       },
       total: 0,
       addForm: {
-        subjectID: "",
-        tagName: ""
+        subjectID: '',
+        tagName: ''
       },
       subjectLists: [],
       editdialogVisible: false,
-      value: "",
+      value: '',
       ruleForm: {
         tagName: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ]
       },
       subjectList: [],
       rules: {
         name: [
-          { required: true, message: "请输入活动名称", trigger: "blur" },
-          { min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur" }
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
         region: [
-          { required: true, message: "请选择活动区域", trigger: "change" }
+          { required: true, message: '请选择活动区域', trigger: 'change' }
         ],
         date1: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "请选择日期",
-            trigger: "change"
+            message: '请选择日期',
+            trigger: 'change'
           }
         ],
         date2: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "请选择时间",
-            trigger: "change"
+            message: '请选择时间',
+            trigger: 'change'
           }
         ],
         type: [
           {
-            type: "array",
+            type: 'array',
             required: true,
-            message: "请至少选择一个活动性质",
-            trigger: "change"
+            message: '请至少选择一个活动性质',
+            trigger: 'change'
           }
         ],
         resource: [
-          { required: true, message: "请选择活动资源", trigger: "change" }
+          { required: true, message: '请选择活动资源', trigger: 'change' }
         ]
       }
-    };
+    }
   },
   methods: {
-    async getList() {
-      try {
-        const { data } = await tagList(this.queryInfo);
-        this.subjectList = data.items;
-        // console.log(data);
-        this.queryInfo.pagesize = parseInt(data.pagesize);
-        this.queryInfo.page = parseInt(data.page);
-        this.total = data.counts;
-      } catch (err) {}
-    },
+    // async getList() {
+    //   try {
+    //     const { data } = await tagList(this.queryInfo)
+    //     this.subjectList = data.items
+    //     // console.log(data);
+    //     this.queryInfo.pagesize = parseInt(data.pagesize)
+    //     this.queryInfo.page = parseInt(data.page)
+    //     this.total = data.counts
+    //   } catch (err) {}
+    // },
     async getTagList() {
+      if (!this.$route.query.id) {
+        this.queryInfo.subjectID = null
+        // URL地址截止于 directorys的话，返回学科隐藏
+      }
       try {
-        const { data } = await tagList(this.queryInfo);
-        this.subjectList = data.items;
+        const { data } = await tagList(this.queryInfo)
+        this.subjectList = data.items
         // console.log(data);
+        this.queryInfo.pagesize = parseInt(data.pagesize)
+        this.queryInfo.page = parseInt(data.page)
+        this.total = data.counts
       } catch (err) {}
     },
     handleSizeChange(newSize) {
-      this.queryInfo.pagesize = newSize;
+      this.queryInfo.pagesize = newSize
 
-      this.getList();
+      this.getTagList()
     },
     handleCurrentChange(newPage) {
-      this.queryInfo.page = newPage;
-      this.getList();
+      this.queryInfo.page = newPage
+      this.getTagList()
     },
     handle(row) {
       //  启用，禁止
-      row.state === 0 ? (row.state = 1) : (row.state = 0);
+      row.state === 0 ? (row.state = 1) : (row.state = 0)
       this.$message({
         showClose: true,
-        message: "操作成功",
-        type: "success"
-      });
+        message: '操作成功',
+        type: 'success'
+      })
     },
     // 删除
     removeUser(tags) {
-      this.$confirm("此操作将永久删除用户 " + ", 是否继续?", "提示", {
-        type: "warning"
+      this.$confirm('此操作将永久删除用户 ' + ', 是否继续?', '提示', {
+        type: 'warning'
       })
         .then(async () => {
           await remove({ id: tags })
             .then(response => {
-              this.$message.success("成功删除了用户" + "!");
-              this.subjectList.splice(tags, 1);
-              this.getTagList();
+              this.$message.success('成功删除了用户' + '!')
+              this.subjectList.splice(tags, 1)
+              this.getTagList()
             })
             .catch(response => {
-              this.$message.error("删除失败!");
-            });
+              this.$message.error('删除失败!')
+            })
         })
         .catch(() => {
-          this.$message.info("已取消操作!");
-        });
+          this.$message.info('已取消操作!')
+        })
     },
     // 获取表单
     async getSubjectList() {
       try {
-        const { data } = await simple();
-        this.subjectLists = data;
+        const { data } = await simple()
+        this.subjectLists = data
       } catch (err) {}
     },
     // 新增标签
@@ -307,53 +332,53 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         if (valid) {
           try {
-            await add(this.addForm);
-            this.dialogVisible = false;
+            await add(this.addForm)
+            this.dialogVisible = false
           } catch (err) {}
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
         this.$message({
           showClose: true,
-          message: "操作成功",
-          type: "success"
-        });
-      });
+          message: '操作成功',
+          type: 'success'
+        })
+      })
     },
     async showEditDialog(item) {
       // console.log(item)
-      this.addForm.subjectID = item.subjectName;
-      this.addForm.tagName = item.tagName;
-      this.editdialogVisible = true;
-      this.id = item.id;
-      this.subjectID = item.subjectID;
+      this.addForm.subjectID = item.subjectName
+      this.addForm.tagName = item.tagName
+      this.editdialogVisible = true
+      this.id = item.id
+      this.subjectID = item.subjectID
     },
     async editValue() {
       const datas = {
         id: this.id,
         tagName: this.addForm.tagName,
         subjectID: this.subjectID
-      };
-      await update(datas);
-      this.editdialogVisible = false;
-      this.getTagList();
+      }
+      await update(datas)
+      this.editdialogVisible = false
+      this.getTagList()
       this.$message({
-        message: "修改成功",
-        type: "success"
-      });
+        message: '修改成功',
+        type: 'success'
+      })
     },
     deleteList(form) {
       // console.log(this.$refs.form);
-      this.queryInfo.tagName = "";
-      this.queryInfo.state = null;
+      this.queryInfo.tagName = ''
+      this.queryInfo.state = null
     }
   },
   created() {
-    this.getTagList();
-    this.getSubjectList();
+    this.getTagList()
+    this.getSubjectList()
   }
-};
+}
 </script>
 
 <style scoped lang="less">
@@ -369,5 +394,16 @@ export default {
 }
 .haihai {
   width: 222px;
+}
+.btn{
+  text-align: right;
+  .btnback{
+    font-size: 14px;
+    margin-right:10px ;
+    margin-top: 3px;
+  }
+}
+.btnbtn {
+  text-align: right;
 }
 </style>

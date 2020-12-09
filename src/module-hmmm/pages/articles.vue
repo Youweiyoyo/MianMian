@@ -69,14 +69,16 @@
         </el-table-column>
         <el-table-column prop="state" label="状态">
           <template slot-scope="scope">
-            <span>{{ scope.row.state == 1 ? "已启用" : "已禁用" }}</span>
+            <span>{{ scope.row.state == 1 ? '已启用' : '已禁用' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="200px">
           <template slot-scope="scope">
-            <el-button type="text">预览</el-button>
+            <el-button type="text" @click="previewData(scope.row.id)"
+              >预览</el-button
+            >
             <el-button type="text" @click="goUse(scope.row)">{{
-              scope.row.state == 0 ? "启用" : "禁用"
+              scope.row.state == 0 ? '启用' : '禁用'
             }}</el-button>
             <el-button
               type="text"
@@ -129,23 +131,33 @@
       >
       </articles-add>
     </el-dialog>
+    <!-- 预览弹出框 -->
+    <el-dialog title="提示" :visible.sync="previewDataVisible" width="30%">
+      <h1></h1>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="previewDataVisible = false">取 消</el-button>
+        <el-button type="primary" @click="previewDataVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { list, remove } from "@/api/hmmm/articles";
-import { parseTimeByString } from "@/filters/index";
-import ArticlesAdd from "../components/articles-add";
+import { list, remove } from '@/api/hmmm/articles'
+import { parseTimeByString } from '@/filters/index'
+import ArticlesAdd from '../components/articles-add'
 
 export default {
-  name: "Articles",
+  name: 'Articles',
   components: { ArticlesAdd },
   data() {
     return {
       articleList: [],
       counts: 0,
       queryInfo: {
-        keyword: "",
+        keyword: '',
         page: 1,
         pagesize: 20,
         state: null
@@ -153,85 +165,85 @@ export default {
       totals: 0,
       dialogFormVisible: false,
       editVisible: false,
-      editArticles: null
-    };
+      editArticles: null,
+      previewDataVisible: false
+    }
   },
   created() {
-    this.getArticleList();
+    this.getArticleList()
   },
   methods: {
     async getArticleList() {
       try {
-        const { data } = await list(this.queryInfo);
-        this.articleList = data.items;
-        this.counts = data.counts;
-        this.queryInfo.page = parseInt(data.page);
-        this.queryInfo.pagesize = parseInt(data.pagesize);
-        this.totals = data.counts;
-        console.log(data);
+        const { data } = await list(this.queryInfo)
+        this.articleList = data.items
+        this.counts = data.counts
+        this.queryInfo.page = parseInt(data.page)
+        this.queryInfo.pagesize = parseInt(data.pagesize)
+        this.totals = data.counts
+        console.log(data)
       } catch (err) {
-        console.log("获取数据失败");
+        console.log('获取数据失败')
       }
     },
 
     handleSizeChange(newSize) {
-      this.queryInfo.pagesize = newSize;
-      this.getArticleList();
+      this.queryInfo.pagesize = newSize
+      this.getArticleList()
     },
 
     handleCurrentChange(newPage) {
-      this.queryInfo.page = newPage;
-      this.getArticleList();
+      this.queryInfo.page = newPage
+      this.getArticleList()
     },
 
     clear() {
-      this.queryInfo.keyword = "";
-      this.queryInfo.state = null;
+      this.queryInfo.keyword = ''
+      this.queryInfo.state = null
     },
 
     goUse(row) {
-      row.state === 0 ? (row.state = 1) : (row.state = 0);
-      this.$message({
-        showClose: true,
-        message: "操作成功",
-        type: "success"
-      });
+      row.state === 0 ? (row.state = 1) : (row.state = 0)
     },
 
     handleClose() {
-      this.dialogVisible = false;
+      this.dialogVisible = false
     },
 
     removeUser(user) {
-      this.$confirm("此操作将永久删除用户 " + ", 是否继续?", "提示", {
-        type: "warning"
+      this.$confirm('此操作将永久删除用户 ' + ', 是否继续?', '提示', {
+        type: 'warning'
       })
         .then(async () => {
           await remove(user)
             .then(response => {
-              this.$message.success("成功删除了改用户" + "!");
-              this.articleList.splice(user, 1);
-              this.getArticleList();
+              this.$message.success('成功删除了改用户' + '!')
+              this.articleList.splice(user, 1)
+              this.getArticleList()
             })
             .catch(response => {
-              this.$message.error("删除失败!");
-            });
+              this.$message.error('删除失败!')
+            })
         })
         .catch(() => {
-          this.$message.info("已取消操作!");
-        });
+          this.$message.info('已取消操作!')
+        })
     },
 
     editDialogShow(item) {
-      this.editVisible = true;
-      this.editArticles = item;
+      this.editVisible = true
+      this.editArticles = item
     },
 
     closeEdit() {
-      this.editVisible = false;
+      this.editVisible = false
+    },
+    // 预览
+    previewData(id) {
+      this.previewDataVisible = true
     }
   }
-};
+}
 </script>
 
 <style scoped lang="less">
