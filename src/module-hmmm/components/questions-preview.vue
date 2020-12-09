@@ -94,17 +94,15 @@
       <span class="in-block">{{ Itemlist.remarks }}</span>
     </div>
     <div class="right">
-      <el-button type="primary" @click="$emit('close', 'questionsClose')"
-        >确 定</el-button
-      >
+      <el-button type="primary" @click="$emit('close')">确 定</el-button>
     </div>
   </div>
 </template>
 
 <script>
-import { detail } from "@/api/hmmm/questions"; // 基础题库接口
+import { detail } from '@/api/hmmm/questions' // 基础题库接口
 export default {
-  name: "QuestionsPreview",
+  name: 'QuestionsPreview',
   components: {},
   props: {
     dataId: {
@@ -118,29 +116,29 @@ export default {
       checked: 1, // 复选框选中video
       Itemlist: [], // 试题列表所有数据
       videoisShow: false, // 控制视频的显示与隐藏
-      checked: "", // 多选框备选中
-      radio: "", // 单选框选中
-      disabled: "", // 控制按钮的禁止选中
+      checked: '', // 多选框备选中
+      radio: '', // 单选框选中
+      disabled: '', // 控制按钮的禁止选中
       options: [] // 答案选项数据
-    };
+    }
   },
   computed: {},
   filters: {},
   watch: {},
   created() {
-    this.getQuestionBankdate();
+    this.getQuestionBankdate()
   },
   methods: {
     async getQuestionBankdate() {
-      const { data: res } = await detail({ id: this.dataId });
-      console.log(res);
-      this.Itemlist = res;
-      this.options = res.options;
-      console.log(this.options);
-      console.log(this.Itemlist);
+      const { data: res } = await detail({ id: this.dataId })
+      console.log(res)
+      this.Itemlist = res
+      this.options = res.options
+      console.log(this.options)
+      console.log(this.Itemlist)
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

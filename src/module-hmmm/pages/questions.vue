@@ -117,13 +117,13 @@
         <el-col :span="6">
           <el-form-item label="录入人" size="small" prop="dataentryclerk">
             <el-select v-model="formList.dataentryclerk" placeholder="请选择">
-              <!-- <el-option
-                v-for="item in options"
+              <el-option
+                v-for="item in formList.addUserList"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value"
               >
-              </el-option> -->
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -266,7 +266,7 @@
     <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
       <questions-preview
         v-if="dialogVisible"
-        @questionsClose="dialogVisible = false"
+        @close="dialogVisible = false"
         :dataId="this.dataId"
       />
     </el-dialog>
@@ -300,6 +300,17 @@ export default {
       rules: {},
       // 表单数据
       formList: {
+        // 录入人
+        addUserList: [
+          {
+            value: '0',
+            label: '超级管理员'
+          },
+          {
+            value: '1',
+            label: '录入管理员'
+          }
+        ],
         tages: '', // 标签
         Subject: '', // 学科表单
         directory: '', // 二级目录
@@ -385,7 +396,7 @@ export default {
         return this.$message('取消了本次删除操作')
       }
       await remove({ id: id }) // 调接口删除
-      return this.$message.success('删除成功')
+      this.$message.success('删除成功')
       this.getTableList() // 刷新列表
     },
     // 添加精选

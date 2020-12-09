@@ -8,21 +8,32 @@
           :closable="false"
         >
         </el-alert>
-        <el-button type="success" icon="el-icon-edit">新增试题</el-button>
+        <el-button
+          type="success"
+          icon="el-icon-edit"
+          @click="$router.push('/questions/new')"
+          >新增试题</el-button
+        >
       </div>
       <el-row>
         <el-col :span="24">
           <div>
-            <el-form ref="form" label-width="80px">
+            <!-- form表单 -->
+            <el-form
+              ref="ResForm"
+              :model="formList"
+              label-width="80px"
+              :rules="rules"
+            >
               <el-col :span="6">
-                <el-form-item label="学科">
+                <el-form-item label="学科" prop="subjectValue">
                   <el-select
-                    v-model="subjectValue"
+                    v-model="formList.subjectValue"
                     placeholder="请选择"
                     @change="handelChange"
                   >
                     <el-option
-                      v-for="(item, index) in subjectSelect"
+                      v-for="(item, index) in formList.subjectSelect"
                       :key="index"
                       :label="item.label"
                       :value="item.value"
@@ -32,10 +43,13 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="二级目录">
-                  <el-select v-model="catalogueValue" placeholder="请选择">
+                <el-form-item label="二级目录" prop="catalogueValue">
+                  <el-select
+                    v-model="formList.catalogueValue"
+                    placeholder="请选择"
+                  >
                     <el-option
-                      v-for="(item, index) in subjectSelectSecond"
+                      v-for="(item, index) in formList.subjectSelectSecond"
                       :key="index"
                       :label="item.directoryName"
                       :value="item.id"
@@ -45,10 +59,10 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="标签">
-                  <el-select v-model="tagValue" placeholder="请选择">
+                <el-form-item label="标签" prop="tagValue">
+                  <el-select v-model="formList.tagValue" placeholder="请选择">
                     <el-option
-                      v-for="item in tagSelectList"
+                      v-for="item in formList.tagSelectList"
                       :key="item.id"
                       :label="item.hadoop"
                       :value="item.id"
@@ -58,15 +72,18 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="关键字">
-                  <el-input></el-input>
+                <el-form-item label="关键字" prop="keyword">
+                  <el-input v-model="formList.keyword"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="试题类型">
-                  <el-select v-model="questionTypeValue" placeholder="请选择">
+                <el-form-item label="试题类型" prop="questionTypeValue">
+                  <el-select
+                    v-model="formList.questionTypeValue"
+                    placeholder="请选择"
+                  >
                     <el-option
-                      v-for="item in questionTypeList"
+                      v-for="item in formList.questionTypeList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -76,10 +93,13 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="难度">
-                  <el-select v-model="difficultyValue" placeholder="请选择">
+                <el-form-item label="难度" prop="difficultyValue">
+                  <el-select
+                    v-model="formList.difficultyValue"
+                    placeholder="请选择"
+                  >
                     <el-option
-                      v-for="item in difficultyList"
+                      v-for="item in formList.difficultyList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -89,10 +109,13 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="方向">
-                  <el-select v-model="directionValue" placeholder="请选择">
+                <el-form-item label="方向" prop="directionValue">
+                  <el-select
+                    v-model="formList.directionValue"
+                    placeholder="请选择"
+                  >
                     <el-option
-                      v-for="(item, index) in directionList"
+                      v-for="(item, index) in formList.directionList"
                       :key="index"
                       :label="item"
                       :value="index"
@@ -102,10 +125,13 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="录入人">
-                  <el-select v-model="addUserValue" placeholder="请选择">
+                <el-form-item label="录入人" prop="addUserValue">
+                  <el-select
+                    v-model="formList.addUserValue"
+                    placeholder="请选择"
+                  >
                     <el-option
-                      v-for="item in addUserList"
+                      v-for="item in formList.addUserList"
                       :key="item.value"
                       :label="item.label"
                       :value="item.value"
@@ -115,20 +141,20 @@
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="题目备注">
-                  <el-input></el-input>
+                <el-form-item label="题目备注" prop="titleNotes">
+                  <el-input v-model="formList.titleNotes"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="企业简称">
-                  <el-input></el-input>
+                <el-form-item label="企业简称" prop="abbreviation">
+                  <el-input v-model="formList.abbreviation"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
-                <el-form-item label="城市">
+                <el-form-item label="城市" prop="provincesValue">
                   <el-col :span="12">
                     <el-select
-                      v-model="provincesValue"
+                      v-model="formList.provincesValue"
                       placeholder="请选择"
                       @change="cityChange"
                     >
@@ -142,7 +168,10 @@
                     </el-select>
                   </el-col>
                   <el-col :span="12">
-                    <el-select v-model="cityValue" placeholder="请选择">
+                    <el-select
+                      v-model="formList.cityValue"
+                      placeholder="请选择"
+                    >
                       <el-option
                         v-for="(item, index) in citiesList"
                         :key="index"
@@ -155,7 +184,7 @@
                 </el-form-item>
               </el-col>
               <el-col class="btn-right" :span="6">
-                <el-button>清除</el-button>
+                <el-button @click="clearForm">清除</el-button>
                 <el-button type="primary">搜索</el-button>
               </el-col>
             </el-form>
@@ -170,6 +199,7 @@
               type="card"
               @tab-click="tableHandleClick"
             >
+              <!-- 全部状态 -->
               <el-tab-pane label="全部" name="first">
                 <template>
                   <el-table fit :data="allTableData" stripe style="width: 100%">
@@ -234,12 +264,38 @@
                       </template>
                     </el-table-column>
                     <el-table-column fixed="right" label="操作" width="200">
-                      <template>
-                        <el-button type="text" size="small">预览</el-button>
-                        <el-button type="text" size="small">审核</el-button>
-                        <el-button type="text" size="small">修改</el-button>
-                        <el-button type="text" size="small">下架</el-button>
-                        <el-button type="text" size="small">删除</el-button>
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="OpenTheopover(scope.row.id)"
+                          >预览</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="auditData(scope.row.id)"
+                          >审核</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="modification"
+                          >修改</el-button
+                        >
+                        <el-button
+                          v-if="scope.row.publishState === '0'"
+                          type="text"
+                          size="small"
+                          @click="soldOut(scope.row.id)"
+                          >下架</el-button
+                        >
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="deleteData(scope.row.id)"
+                          >删除</el-button
+                        >
                       </template>
                     </el-table-column>
                   </el-table>
@@ -255,6 +311,7 @@
                   </el-pagination>
                 </template>
               </el-tab-pane>
+              <!-- 待审核状态 -->
               <el-tab-pane label="待审核" name="second">
                 <template>
                   <el-table fit :data="allTableData" stripe style="width: 100%">
@@ -319,10 +376,20 @@
                       </template>
                     </el-table-column>
                     <el-table-column fixed="right" label="操作" width="200">
-                      <template>
-                        <el-button type="text" size="small">预览</el-button>
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="OpenTheopover(scope.row.id)"
+                          >预览</el-button
+                        >
                         <el-button type="text" size="small">审核</el-button>
-                        <el-button type="text" size="small">修改</el-button>
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="modification"
+                          >修改</el-button
+                        >
                         <el-button type="text" size="small">下架</el-button>
                         <el-button type="text" size="small">删除</el-button>
                       </template>
@@ -340,6 +407,7 @@
                   </el-pagination>
                 </template>
               </el-tab-pane>
+              <!-- 已审核状态 -->
               <el-tab-pane label="已审核" name="third">
                 <template>
                   <el-table fit :data="allTableData" stripe style="width: 100%">
@@ -404,10 +472,20 @@
                       </template>
                     </el-table-column>
                     <el-table-column fixed="right" label="操作" width="200">
-                      <template>
-                        <el-button type="text" size="small">预览</el-button>
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="OpenTheopover(scope.row.id)"
+                          >预览</el-button
+                        >
                         <el-button type="text" size="small">审核</el-button>
-                        <el-button type="text" size="small">修改</el-button>
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="modification"
+                          >修改</el-button
+                        >
                         <el-button type="text" size="small">下架</el-button>
                         <el-button type="text" size="small">删除</el-button>
                       </template>
@@ -425,6 +503,7 @@
                   </el-pagination>
                 </template>
               </el-tab-pane>
+              <!-- 已拒绝状态 -->
               <el-tab-pane label="已拒绝" name="fourth">
                 <template>
                   <el-table fit :data="allTableData" stripe style="width: 100%">
@@ -489,10 +568,20 @@
                       </template>
                     </el-table-column>
                     <el-table-column fixed="right" label="操作" width="200">
-                      <template>
-                        <el-button type="text" size="small">预览</el-button>
+                      <template slot-scope="scope">
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="OpenTheopover(scope.row.id)"
+                          >预览</el-button
+                        >
                         <el-button type="text" size="small">审核</el-button>
-                        <el-button type="text" size="small">修改</el-button>
+                        <el-button
+                          type="text"
+                          size="small"
+                          @click="modification"
+                          >修改</el-button
+                        >
                         <el-button type="text" size="small">下架</el-button>
                         <el-button type="text" size="small">删除</el-button>
                       </template>
@@ -515,6 +604,37 @@
         </el-col>
       </el-row>
     </el-card>
+    <!-- 预览弹出框 -->
+    <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+      <questions-preview
+        :dataId="this.dataId"
+        v-if="dialogVisible"
+        @close="dialogVisible = false"
+      />
+    </el-dialog>
+    <!-- 审核弹出框 -->
+    <el-dialog title="提示" :visible.sync="auditDialogVisible" width="20%">
+      <el-form>
+        <el-radio-group v-model="radio">
+          <el-radio :label="3">通过</el-radio>
+          <el-radio :label="6">拒绝</el-radio>
+        </el-radio-group>
+        <el-input
+          class="textarea"
+          type="textarea"
+          :rows="2"
+          placeholder="请输入内容"
+          v-model="textarea"
+        >
+        </el-input>
+        <div class="flexRight">
+          <el-button @click="auditDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="auditDialogVisible = false"
+            >确 定</el-button
+          >
+        </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -526,57 +646,74 @@ import { list as companyList } from '@/api/hmmm/companys'
 import { choice as questChoice } from '@/api/hmmm/questions'
 import { provinces, citys } from '@/api/hmmm/citys'
 import { parseTime } from '@/filters/index'
+import { choicePublish, remove } from '@/api/hmmm/questions' // 上下架题库接口
+// 引入预览组件
+import QuestionsPreview from '../../module-hmmm/components/questions-preview'
 export default {
   name: '',
-  components: {},
+  components: {
+    QuestionsPreview // 注册预览组件
+  },
   props: {},
   data() {
     return {
-      // 题型
-      questionTypeList: questionType,
-      // 难度
-      difficultyList: difficulty,
-      // 方向
-      directionList: direction,
-      // 录入人
-      addUserList: [
-        {
-          value: '0',
-          label: '超级管理员'
-        },
-        {
-          value: '1',
-          label: '录入管理员'
-        }
-      ],
-      // 学科
-      subjectSelect: [],
-      // 二级目录
-      subjectSelectSecond: [],
-      // 标签
-      tagSelectList: [],
-      // 表格数据
-      allTableData: [],
+      auditDialogVisible: false, // 审核弹出框
+      dataId: '', // 传入当前的id
+      dialogVisible: false, // 预览弹出框显示
+      // form表单v-model数据
+      formList: {
+        // 题型
+        questionTypeList: questionType,
+        // 难度
+        difficultyList: difficulty,
+        // 方向
+        directionList: direction,
+        // 录入人
+        addUserList: [
+          {
+            value: '0',
+            label: '超级管理员'
+          },
+          {
+            value: '1',
+            label: '录入管理员'
+          }
+        ],
+        // 学科
+        subjectSelect: [],
+        // 二级目录
+        subjectSelectSecond: [],
+        // 标签
+        tagSelectList: [],
+
+        subjectValue: '',
+        tagValue: '',
+        catalogueValue: '',
+        questionTypeValue: '',
+        difficultyValue: '',
+        provincesValue: '',
+        cityValue: '',
+        addUserValue: '',
+        directionValue: '',
+        keyword: '', // 关键字
+        titleNotes: '', // 题目备注
+        abbreviation: '' // 企业简称
+      },
       // 省份
       provincesList: [],
       // 城市
       citiesList: [],
-      subjectValue: '',
-      tagValue: '',
-      catalogueValue: '',
-      questionTypeValue: '',
-      difficultyValue: '',
-      provincesValue: '',
-      cityValue: '',
-      addUserValue: '',
-      directionValue: '',
+      // 表格数据
+      allTableData: [],
       activeName: 'first',
       queryInfo: {
         page: 1,
         pagesize: 2,
         chkState: null
       },
-      total: 0
+      total: 0,
+      // 校验规则
+      rules: {}
     }
   },
   computed: {},
@@ -609,7 +746,7 @@ export default {
     async getSubjectSelect() {
       try {
         const { data } = await simple()
-        this.subjectSelect = data
+        this.formList.subjectSelect = data
         console.log(data)
       } catch (err) {
         console.log(err)
@@ -622,9 +759,9 @@ export default {
         const { data } = await catalogueList({ subjectID: value })
         //标签
         const { data: res } = await tagList({ subjectID: value })
-        this.tagSelectList = res.items
+        this.formList.tagSelectList = res.items
         console.log(res.items)
-        this.subjectSelectSecond = data.items
+        this.formList.subjectSelectSecond = data.items
         console.log(data)
       } catch (err) {
         console.log(err)
@@ -657,6 +794,53 @@ export default {
     handleCurrentChange(newPage) {
       this.queryInfo.page = newPage
       this.getQuestionList()
+    },
+    // 弹出框事件
+    OpenTheopover(id) {
+      console.log(id)
+      this.dialogVisible = true
+      this.dataId = id
+    },
+    // 清除表单事件
+    clearForm() {
+      this.formList.cityValue == ''
+      this.$refs.ResForm.resetFields()
+    },
+    // 修改按钮
+    modification() {
+      this.$router.push('/questions/new')
+    },
+    // 题目下架
+    async soldOut(id) {
+      // 先弹框询问
+      const configDel = await this.$confirm('您确认下架这道题目嘛？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (configDel !== 'confirm') {
+        return this.$message('取消了本次下架操作')
+      }
+      await choicePublish({ id: id, publishState: 0 })
+      this.$message.success('下架成功')
+    },
+    // 题目删除
+    async deleteData(id) {
+      // 先弹框询问
+      const configDel = await this.$confirm('您确认删除这道题目嘛？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (configDel !== 'confirm') {
+        return this.$message('取消了本次删除操作')
+      }
+      await remove({ id: id })
+      this.$message.success('删除成功')
+    },
+    // 题目审核
+    auditData(id) {
+      this.auditDialogVisible = true
     }
   }
 }
@@ -678,6 +862,13 @@ export default {
   /deep/ .btn-right {
     display: flex;
     justify-content: flex-end;
+  }
+  .flexRight {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .textarea {
+    margin: 20px 0;
   }
 }
 </style>
