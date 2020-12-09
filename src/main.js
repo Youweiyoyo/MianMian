@@ -19,9 +19,16 @@ import 'font-awesome/css/font-awesome.css'
 import dashboard from '@/module-dashboard/' // 面板
 import base from '@/module-manage/' // 用户管理
 import hmmm from '@/module-hmmm/' // 黑马面面
+// 导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+// require styles导入富文本编辑器对应的样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 Vue.use(dashboard, store)
 Vue.use(base, store)
+Vue.use(VueQuillEditor)
 // Vue.use(list, store)
 // Vue.use(form, store)
 // Vue.use(details, store)
