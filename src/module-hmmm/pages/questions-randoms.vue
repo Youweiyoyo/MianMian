@@ -5,14 +5,14 @@
       <el-form>
         <span class="spn">关键字</span>
         <el-input
-          v-model="saerch"
+          v-model="queryInfo.keyword"
           class="input"
           size="small"
           placeholder="根据编号搜索"
         ></el-input>
         <span class="right">
           <el-button size="small" @click="clear">清除</el-button>
-          <el-button type="primary" size="small" @click="this.getTableList()"
+          <el-button type="primary" size="small" @click="getTableList"
             >搜索</el-button
           >
         </span>
@@ -94,6 +94,7 @@ export default {
   props: {},
   data() {
     return {
+      keyword: '',
       queryInfo: {
         page: 1, // 当前页码
         pagesize: 20 // 当前每页显示多少条数据
@@ -114,7 +115,7 @@ export default {
   methods: {
     // 清空搜索框
     clear() {
-      this.saerch = "";
+      this.queryInfo.keyword = "";
     },
     // 渲染表格的事件
     async getTableList() {
