@@ -156,7 +156,7 @@
             <!-- options 用来指定数据源 -->
             <!-- props 用来指定配置对象 -->
             <!-- value对应的是id，所以根据v-model就可以获取到value中绑定的值，就是学科的id -->
-            <el-select v-model="addForm.subjectID" placeholder="请选择">
+            <el-select v-model="addForm.subjectID" placeholder="请选择" style="width: 100%">
               <el-option
                 style="width: 289px"
                 v-for="item in getSubList"
@@ -201,7 +201,7 @@
           <!-- 所属学科 -->
           <el-form-item label="所属学科">
             <!-- v-model 绑定的是 -->
-            <el-select v-model="addForm.subjectID" placeholder="请选择">
+            <el-select v-model="addForm.subjectID" placeholder="请选择" style="width: 100%">
               <el-option
                 style="width: 289px"
                 v-for="item in getSubList"
@@ -428,7 +428,7 @@ export default {
       // 所属学科 目录名称 id
       this.addForm.directoryName = item.directoryName;
       this.addForm.id = item.id;
-      this.addForm.subjectID = item.id;
+      this.addForm.subjectID = item.subjectID;
       this.addForm.subjectName = item.subjectName;
     },
     // 点击确定按钮，提交修改后的表单数据
@@ -488,9 +488,7 @@ export default {
     justify-content: flex-end;
   }
   .stabtn {
-    cursor: pointer;
     padding-top: 3px;
   }
-  // cursor: pointer;
 }
 </style>
