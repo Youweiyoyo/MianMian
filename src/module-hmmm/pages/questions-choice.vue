@@ -247,7 +247,7 @@
                       <template slot-scope="scope">
                         <span v-if="scope.row.chkState === 0">待审核</span>
                         <span v-else-if="scope.row.chkState === 1">通过</span>
-                        <span v-else>拒接</span>
+                        <span v-else>拒绝</span>
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -272,6 +272,17 @@
                           >预览</el-button
                         >
                         <el-button
+                          v-if="
+                            scope.row.chkState === 1 || scope.row.chkState === 2
+                          "
+                          disabled
+                          type="text"
+                          size="small"
+                          @click="auditData(scope.row.id)"
+                          >审核</el-button
+                        >
+                        <el-button
+                          v-else
                           type="text"
                           size="small"
                           @click="auditData(scope.row.id)"
@@ -283,11 +294,19 @@
                           @click="modification"
                           >修改</el-button
                         >
+                        <!-- 上下架按钮 -->
                         <el-button
-                          v-if="scope.row.publishState === '0'"
+                          v-if="scope.row.publishState === 0"
                           type="text"
                           size="small"
-                          @click="soldOut(scope.row.id)"
+                          @click="soldOut(scope.row)"
+                          >上架</el-button
+                        >
+                        <el-button
+                          v-else
+                          type="text"
+                          size="small"
+                          @click="soldOut(scope.row)"
                           >下架</el-button
                         >
                         <el-button
@@ -359,7 +378,7 @@
                       <template slot-scope="scope">
                         <span v-if="scope.row.chkState === 0">待审核</span>
                         <span v-else-if="scope.row.chkState === 1">通过</span>
-                        <span v-else>拒接</span>
+                        <span v-else>拒绝</span>
                       </template>
                     </el-table-column>
                     <el-table-column
@@ -650,7 +669,7 @@ import { choicePublish, remove } from '@/api/hmmm/questions' // 上下架题库�
 // 引入预览组件
 import QuestionsPreview from '../../module-hmmm/components/questions-preview'
 export default {
-  name: '',
+  name: 'QuestionsChoice',
   components: {
     QuestionsPreview // 注册预览组件
   },
@@ -811,18 +830,28 @@ export default {
       this.$router.push('/questions/new')
     },
     // 题目下架
-    async soldOut(id) {
+    async soldOut(item) {
+      console.log(item)
+      if (item.publishState === 1) {
+        var publishState = 0
+        var text = `您确定下架这道题目吗`
+      } else {
+        publishState = 1
+        text = `您确定上架这道题目吗`
+      }
+      console.log(item.id)
+      console.log(publishState)
       // 先弹框询问
-      const configDel = await this.$confirm('您确认下架这道题目嘛？', '提示', {
+      const configDel = await this.$confirm(text, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).catch(err => err)
       if (configDel !== 'confirm') {
-        return this.$message('取消了本次下架操作')
+        return this.$message('取消了本次操作')
       }
-      await choicePublish({ id: id, publishState: 0 })
-      this.$message.success('下架成功')
+      await choicePublish({ id: item.id, publishState: publishState })
+      this.$message.success('操作成功')
     },
     // 题目删除
     async deleteData(id) {
