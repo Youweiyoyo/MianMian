@@ -64,22 +64,18 @@
         <el-table-column
           label="序号"
           type="index"
-          width="80px"
         ></el-table-column>
         <el-table-column
           label="所属学科"
           prop="subjectName"
-          width="120px"
         ></el-table-column>
         <el-table-column
           label="目录名称"
           prop="directoryName"
-          width="120px"
         ></el-table-column>
         <el-table-column
           label="创建者"
           prop="username"
-          width="120px"
         ></el-table-column>
         <el-table-column label="创建日期" width="160px">
           <template slot-scope="scope">
@@ -89,10 +85,9 @@
         <el-table-column
           label="面试题数量"
           prop="totals"
-          width="140px"
         ></el-table-column>
         <!-- 状态 1 启用 0 屏蔽-->
-        <el-table-column label="状态" width="110px">
+        <el-table-column label="状态">
           <template slot-scope="scope">
             <span>{{ scope.row.state === 1 ? "已启用" : "已禁用" }}</span>
           </template>

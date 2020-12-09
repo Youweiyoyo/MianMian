@@ -296,8 +296,7 @@ export default {
     },
     closeVideo() {
       var bigBox = document.querySelector('.bigBox')
-       bigBox.style.display = 'none'
-     
+      bigBox.style.display = 'none'
     }
     // open(url) {
     //   this.src = url // 获取视频路径
@@ -336,13 +335,13 @@ body {
 
 .bigBox {
   display: none;
+  position: fixed;
+  z-index: 1002;
   width: 100%;
   height: 100%;
-  position: absolute;
   left: 0;
   top: 0;
-  z-index: 88;
-  // background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.3);
   /deep/.video {
     position: absolute;
     top: 50%;
@@ -354,7 +353,7 @@ body {
   /deep/ .el-icon-error {
     position: absolute;
     top: -105px;
-    left: 333px;
+    left: 365px;
     font-size: 50px;
   }
 }
