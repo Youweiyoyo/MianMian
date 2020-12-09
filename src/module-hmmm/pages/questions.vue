@@ -24,7 +24,7 @@
       >
         <!-- 第一行 -->
         <el-col :span="6">
-          <el-form-item label="学科" size="small" prop="Subject">
+          <el-form-item label="学科" size="small" prop="subjectID">
             <el-select
               v-model="formList.subjectID"
               placeholder="请选择"

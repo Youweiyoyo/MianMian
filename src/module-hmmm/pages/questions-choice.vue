@@ -73,7 +73,7 @@
               </el-col>
               <el-col :span="6">
                 <el-form-item label="关键字" prop="keyword">
-                  <el-input v-model="formList.keyword"></el-input>
+                  <el-input v-model="queryInfo.keyword"></el-input>
                 </el-form-item>
               </el-col>
               <el-col :span="6">
@@ -185,7 +185,9 @@
               </el-col>
               <el-col class="btn-right" :span="6">
                 <el-button @click="clearForm">清除</el-button>
-                <el-button type="primary">搜索</el-button>
+                <el-button type="primary" @click="getQuestionList()"
+                  >搜索</el-button
+                >
               </el-col>
             </el-form>
           </div>
@@ -712,7 +714,7 @@ export default {
         cityValue: '',
         addUserValue: '',
         directionValue: '',
-        keyword: '', // 关键字
+        // keyword: '', // 关键字
         titleNotes: '', // 题目备注
         abbreviation: '' // 企业简称
       },
@@ -724,6 +726,7 @@ export default {
       allTableData: [],
       activeName: 'first',
       queryInfo: {
+        keyword: '',
         page: 1,
         pagesize: 2,
         chkState: null
@@ -800,6 +803,7 @@ export default {
     async getQuestionList() {
       try {
         const { data } = await questChoice(this.queryInfo)
+        // const { data } = await questChoice({...this.queryInfo,...this.formList})
         console.log(data)
         this.allTableData = data.items
         this.queryInfo.page = parseInt(data.page)
@@ -829,6 +833,7 @@ export default {
       this.$refs.ResForm.resetFields()
       this.citiesList = []
       this.formList.cityValue = ''
+      this.queryInfo.keyword = ''
     },
     // 修改按钮
     modification(item) {
