@@ -70,7 +70,7 @@
           <el-form-item label="关键字" size="small" prop="keyword">
             <el-input
               placeholder="根据题干搜索"
-              v-model="counts.keyword"
+              v-model="formList.keyword"
             ></el-input>
           </el-form-item>
         </el-col>
@@ -171,7 +171,7 @@
         </el-col>
         <el-col :span="6" class="behind">
           <el-button size="small" @click="RefstForm">清除</el-button>
-          <el-button type="primary" size="small" @click="getTableList()"
+          <el-button type="primary" size="small" @click="searchQuestion"
             >搜索</el-button
           >
         </el-col>
@@ -293,7 +293,6 @@ export default {
       tableData: [], // 表格数据
       // 获取用户列表的参数对象
       counts: {
-        keyword: '',
         page: 1, // 当前的页数
         pagesize: 2 // 当前每页显示多少条数据
       },
@@ -322,8 +321,8 @@ export default {
         Titlenotes: '', // 题目备注
         shortened: '', // 企业简称
         city: '', // 城市
-        cityTwo: '' // 城市二
-        // keyword: '' // 关键字
+        cityTwo: '', // 城市二
+        keyword: '' // 关键字
       },
       total: 0, // 共有多少条数据
       List: [], // 获取所有学科数据
@@ -347,13 +346,11 @@ export default {
     // 发起渲染表格的请求
     async getTableList() {
       try {
-        // const { data } = await list({ ...this.counts, ...this.formList })
-        const { data } = await list({ ...this.counts })
+        const { data } = await list(this.counts)
         this.tableData = data.items // 表格数据
         this.counts.page = parseInt(data.page) //  当前页数
         this.counts.pagesize = parseInt(data.pagesize) // 当前每页显示多少条数据
         this.total = data.counts // 共多少条数据
-        console.log(data)
       } catch (err) {
         console.log(err)
       }
@@ -370,13 +367,10 @@ export default {
     },
     // 学科的change事件
     async alterchange(id) {
-      console.log(id)
       try {
         const { data } = await directList({ subjectID: id })
-        console.log(data)
         this.catalogue = data.items
         const { data: res } = await dierctsimple()
-        console.log(res)
         this.tageList = res.items
       } catch (err) {
         console.log(err)
@@ -403,7 +397,6 @@ export default {
     },
     // 添加精选
     async Addtheselected(value) {
-      console.log(value)
       // 先弹框询问
       this.$confirm('此操作将题目添加到精选题库, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -423,15 +416,12 @@ export default {
     },
     // 清空表单数据
     RefstForm() {
-      console.log(this)
       this.$refs.formRef.resetFields()
-      this.counts.keyword = ''
       this.formList.cityTwo = ''
       this.citydataTwo = []
     },
     // 监听pageSize事件
     handleSizeChange(newSize) {
-      // console.log(newSize);
       this.counts.pagesize = newSize
       this.getTableList()
     },
@@ -446,16 +436,29 @@ export default {
     },
     // 预览
     preview(id) {
-      console.log(id)
       this.dialogVisible = true
       this.dataId = id
     },
     toEdit(item) {
-      console.log(item)
       this.$router.push({
         path: 'new',
         query: { id: item.id }
       })
+    },
+    // 搜索
+    async searchQuestion() {
+      try {
+        const { data } = await list({
+          keyword: this.formList.keyword,
+          subjectID: this.formList.subjectID
+        })
+        this.tableData = data.items // 表格数据
+        this.counts.page = parseInt(data.page) //  当前页数
+        this.counts.pagesize = parseInt(data.pagesize) // 当前每页显示多少条数据
+        this.total = data.counts // 共多少条数据
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
 }
