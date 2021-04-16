@@ -405,14 +405,14 @@ export default {
       })
         .then(async () => {
           await choiceAdd({ id: value.id, choiceState: 1 })
+          this.$router.push('/questions/choice')
         })
         .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
+            type: 'info'
           })
+          message: '已取消删除'
         })
-      this.$router.push('/questions/choice')
     },
     // 清空表单数据
     RefstForm() {
